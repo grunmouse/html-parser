@@ -1,6 +1,6 @@
 const sym = {
 	StartClose:Symbol('</'),
-	StartOpen:Symbol('</'),
+	StartOpen:Symbol('<'),
 	EndSelfclose:Symbol('/>'),
 	End:Symbol('>'),
 	Equal:Symbol('='),
