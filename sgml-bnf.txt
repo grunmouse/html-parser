@@ -1,0 +1,573 @@
+SGML_document  ::= SGML_document_entity ( SGML_subdocument_entity
+	   | SGML_text_entity | character_data_entity 
+	   | specific_character_data_entity | non_SGML_data_entity )*;
+
+SGML_document_entity  ::= s* SGML_declaration prolog document_instance_set Ee;
+
+SGML_subdocument_entity  ::= prolog document_instance_set Ee;
+
+SGML_text_entity  ::= SGML_character* Ee;
+
+s  ::= SPACE| RE| RS| SEPCHAR ;
+
+character_data_entity  ::= SGML_character* Ee ;
+
+specific_character_data_entity  ::= SGML_character* Ee;
+
+non_SGML_data_entity  ::= character* Ee;
+
+prolog  ::= other_prolog* base_document_type_declaration 
+	   ( document_type_declaration | other_prolog )*
+	   ( link_type_declaration | other_prolog )*;
+
+other_prolog  ::= comment_declaration | processing_instruction | s;
+
+base_document_type_declaration  ::= document_type_declaration ;
+
+document_instance_set  ::= base_document_element other_prolog*;
+
+base_document_element  ::= document_element ;
+
+document_element  ::= element ;
+
+element  ::= start_tag? content end_tag?;
+
+start_tag  ::= ( STAGO document_type_specification 
+	    generic_identifier_specification attribute_specification_list 
+	    s* TAGC  ) | minimized_start_tag;
+
+minimized_start_tag  ::= empty_start_tag | unclosed_start_tag
+	| net_enabling_start_tag;
+
+empty_start_tag  ::= STAGO TAGC;
+
+unclosed_start_tag  ::= STAGO document_type_specification 
+	  generic_identifier_specification 
+	  attribute_specification_list s*;
+
+net_enabling_start_tag  ::= STAGO generic_identifier_specification 
+	  attribute_specification_list s* NET;
+
+end_tag  ::= ( ETAGO document_type_specification 
+	    generic_identifier_specification s* TAGC  ) | minimized_end_tag;
+
+minimized_end_tag  ::= empty_end_tag | unclosed_end_tag | null_end_tag;
+
+empty_end_tag  ::= ETAGO TAGC;
+
+unclosed_end_tag  ::= ETAGO document_type_specification 
+	  generic_identifier_specification s*;
+
+null_end_tag  ::= NET ;
+
+content  ::= mixed_content | element_content | replaceable_character_data
+	| character_data;
+
+mixed_content  ::= ( data_character | element | other_content )*;
+
+element_content  ::= ( element | other_content | s )*;
+
+other_content  ::= comment_declaration | short_reference_use_declaration
+	| link_set_use_declaration | processing_instruction | SHORTREF
+	| character_reference | general_entity_reference
+	| marked_section_declaration | Ee;
+
+document_type_specification  ::= name_group? ;
+
+generic_identifier_specification  ::= generic_identifier | rank_stem;
+
+generic_identifier  ::= name ;
+
+attribute_specification_list  ::= attribute_specification* ;
+
+attribute_specification  ::= s* ( name s* VI s* )?
+	  attribute_value_specification;
+
+attribute_value_specification  ::= attribute_value | attribute_value_literal;
+
+attribute_value_literal  ::= ( LIT replaceable_character_data LIT  ) 
+        | ( LITA replaceable_character_data LITA  );
+
+attribute_value  ::= character_data | general_entity_name
+	| general_entity_name_list | id_value | id_reference_value
+	| id_reference_list | name | name_list | name_token
+	| name_token_list | notation_name | number | number_list
+	| number_token | number_token_list;
+
+general_entity_name_list  ::= name_list ;
+
+id_value  ::= name ;
+
+id_reference_list  ::= name_list ;
+
+id_reference_value  ::= name ;
+
+name_list  ::= name ( SPACE name )*;
+
+name_token_list  ::= name_token ( SPACE name_token )*;
+
+notation_name  ::= name ;
+
+number_list  ::=
+	  number 
+	   ( SPACE
+	     number )*;
+
+number_token_list  ::= number_token ( SPACE number_token )*;
+
+processing_instruction  ::= PIO system_data PIC;
+
+system_data  ::= character_data ;
+
+replaceable_character_data  ::= ( data_character | character_reference
+	 | general_entity_reference | Ee )*;
+
+character_data  ::= data_character* ;
+
+data_character  ::= SGML_character ;
+
+character  ::= SGML_character | NONSGML;
+
+SGML_character  ::= markup_character | DATACHAR;
+
+markup_character  ::= name_character | function_character | DELMCHAR;
+
+name_character  ::= name_start_character | DIGIT | LCNMCHAR | UCNMCHAR;
+
+name_start_character  ::= LC_Letter | UC_LETTER | LCNMSTRT | UCNMSTRT;
+
+function_character  ::= RE | RS | SPACE | SEPCHAR | MSOCHAR | MSICHAR
+	| MSSCHAR | FUNCHAR;
+
+name  ::=
+	  name_start_character 
+     name_character*;
+
+number  ::=
+	DIGIT+;
+
+name_token  ::= name_character+ ;
+
+number_token  ::= DIGIT name_character*;
+
+general_entity_reference  ::= ERO name_group? name reference_end;
+
+parameter_entity_reference  ::= PERO name_group? name reference_end;
+
+reference_end  ::= ( REFC | RE )?;
+
+character_reference  ::= cro ( function_name | character_number ) reference_end;
+
+function_name  ::= "RE" | "RS" | "SPACE" | name;
+
+character_number  ::= number ;
+
+ps  ::= s | Ee | parameter_entity_reference | comment;
+
+parameter_literal  ::= ( LIT replaceable_parameter_data LIT  )
+	| ( LITA replaceable_parameter_data LITA  );
+
+replaceable_parameter_data  ::= ( data_character | character_reference
+	 | parameter_entity_reference | Ee )*;
+
+name_token_group  ::= GRPO ts* name_token (  ts* connector ts* 
+	     name_token )* ts* GRPC;
+
+name_group  ::= GRPO ts* name (  ts* connector ts* name )* ts* GRPC;
+
+ts  ::= s | Ee | parameter_entity_reference;
+
+ds  ::= s | Ee | parameter_entity_reference | comment_declaration
+	| processing_instruction | marked_section_declaration;
+
+associated_element_type  ::= generic_identifier | name_group ;
+
+external_identifier  ::= ( "SYSTEM" | ( "PUBLIC" ps+ public_identifier ) )
+	   ( ps+ system_identifier )?;
+
+public_identifier  ::= minimum_literal;
+
+system_identifier  ::= ( LIT system_data LIT  )
+	| ( LITA system_data LITA  );
+
+minimum_literal  ::= ( LIT minimum_data LIT  )
+	| ( LITA minimum_data LITA  )
+
+minimum_data  ::= minimum_data_character*;
+
+minimum_data_character  ::= RS | RE | SPACE | LC_Letter | UC_LETTER
+	| DIGIT | SPECIAL;
+
+formal_public_identifier  ::=
+	  owner_identifier 
+	  SOLIDUS SOLIDUS
+	  text_identifier;
+
+owner_identifier  ::=
+	  ISO_owner_identifier 
+	| registered_owner_identifier
+	| unregistered_owner_identifier;
+
+ISO_owner_identifier  ::= minimum_data ;
+
+registered_owner_identifier  ::= PLUS SOLIDUS SOLIDUS minimum_data;
+
+unregistered_owner_identifier  ::= MINUS SOLIDUS SOLIDUS minimum_data;
+
+text_identifier  ::= public_text_class SPACE unavailable_text_indicator? 
+	  public_text_description SOLIDUS SOLIDUS
+	  ( public_text_language | public_text_designating_sequence )
+	  ( SOLIDUS SOLIDUS public_text_display_version )?;
+
+unavailable_text_indicator  ::= MINUS SOLIDUS SOLIDUS;
+
+public_text_class  ::= "CAPACITY" | "CHARSET" | "DOCUMENT" | "DTD"
+	| "ELEMENTS" | "ENTITIES" | "LPD" | "NONSGML" | "NOTATION"
+	| "SHORTREF" | "SUBDOC" | "SYNTAX" | "TEXT";
+
+public_text_description  ::= ISO_text_description | minimum_data;
+
+ISO_text_description  ::= minimum_data ;
+
+public_text_language  ::= name ;
+
+public_text_designating_sequence  ::= minimum_data ;
+
+public_text_display_version  ::= minimum_data ;
+
+comment_declaration  ::= MDO ( comment ( s | comment )* )? MDC;
+
+comment  ::= COM SGML_character* COM;
+
+marked_section_declaration  ::= marked_section_start 
+	  status_keyword_specification DSO marked_section marked_section_end;
+
+marked_section_start  ::= MDC DSO;
+
+marked_section_end  ::= MSC MDC;
+
+marked_section  ::= SGML_character*;
+
+status_keyword_specification  ::= ( ps+ ( status_keyword
+	     | "TEMP" )* ) ps*;
+
+status_keyword  ::= "CDATA" | "IGNORE" | "INCLUDE" | "RCDATA";
+
+entity_declaration  ::= MDC "ENTITY" ps+ entity_name ps+ 
+	  entity_text ps* MDC;
+
+entity_name  ::= general_entity_name | parameter_entity_name;
+
+general_entity_name  ::= name | ( RNI "DEFAULT" );
+
+parameter_entity_name  ::= PERO ps+ name;
+
+entity_text  ::= parameter_literal | data_text
+	| bracketed_text | external_entity_specification;
+
+data_text  ::= ( "CDATA" | "SDATA" | "PI" ) ps+ parameter_literal;
+
+bracketed_text  ::= ( "STARTTAG" | "ENDTAG" | "MS" | "MD" )
+	  ps+ parameter_literal;
+
+external_entity_specification  ::= external_identifier ( ps+ entity_type )?;
+
+entity_type  ::= "SUBDOC" | ( ( "CDATA" | "NDATA"
+	    | "SDATA" ) ps+ notation_name data_attribute_specification?  );
+
+document_type_declaration  ::= MDC "DOCTYPE" ps+ document_type_name 
+	  ( ps+ external_identifier )?
+	   ( ps+ DSO document_type_declaration_subset DSC  )? ps* MDC;
+
+document_type_name  ::= generic_identifier ;
+
+document_type_declaration_subset  ::= ( entity_declaration
+	 | element_declaration | attribute_definition_list_declaration
+	 | notation_declaration | short_reference_mapping_declaration
+	 | short_reference_use_declaration | ds )*;
+
+entity_set  ::= ( entity_declaration | ds )*;
+
+element_set  ::= ( element_declaration | attribute_definition_list_declaration
+	 | notation_declaration | ds )*;
+
+short_reference_set  ::= ( entity_declaration
+	 | short_reference_mapping_declaration
+	 | short_reference_use_declaration | ds )*;
+
+element_declaration  ::= MDC "ELEMENT" ps+ 
+	  element_type ( ps+ omitted_tag_minimization )?
+	  ps+ ( declared_content | content_model ) ps* MDC;
+
+element_type  ::= generic_identifier | name_group | ranked_element
+	| ranked_group;
+
+ranked_element  ::= rank_stem ps+ rank_suffix;
+
+ranked_group  ::= GRPO ts* rank_stem 
+	  ( ts* connector ts* rank_stem )*
+	  ts* GRPC ps+ rank_suffix;
+
+rank_stem  ::= name ;
+
+rank_suffix  ::= number ;
+
+omitted_tag_minimization  ::= start_tag_minimization ps+ 
+	  end_tag_minimization;
+
+start_tag_minimization  ::= "O" | MINUS;
+
+end_tag_minimization  ::= "O" | MINUS;
+
+declared_content  ::= "CDATA" | "RCDATA" | "EMPTY";
+
+content_model  ::= ( model_group | "ANY" ) ( ps+ exceptions )?;
+
+model_group  ::= GRPO ts* content_token 
+	  ( ts* connector ts* content_token )*
+	  ts* GRPC occurrence_indicator?;
+
+content_token  ::= primitive_content_token | model_group;
+
+primitive_content_token  ::= ( RNI "PCDATA" )
+	| element_token | data_tag_group;
+
+element_token  ::= generic_identifier occurrence_indicator?;
+
+connector  ::= AND | OR | SEQ;
+
+occurrence_indicator  ::= OPT | PLUS | REP;
+
+data_tag_group  ::= DTGO ts* generic_identifier ts* SEQ 
+	  ts* data_tag_pattern ts* DTGC occurrence_indicator?;
+
+data_tag_pattern  ::= ( data_tag_template_group | data_tag_template )
+	   ( ts* SEQ ts* data_tag_padding_template )?;
+
+data_tag_template_group  ::= GRPO ts* data_tag_template 
+	  (  ts* OR ts* data_tag_template )* ts* GRPC;
+
+data_tag_template  ::= parameter_literal ;
+
+data_tag_padding_template  ::= parameter_literal ;
+
+exceptions  ::= ( exclusions ( ps+ inclusions )? ) | inclusions;
+
+inclusions  ::= PLUS name_group;
+
+exclusions  ::= MINUS name_group;
+
+attribute_definition_list_declaration  ::= MDC "ATTLIST"
+	  ps+ ( associated_element_type | associated_notation_name  )
+	  ps+ attribute_definition_list ps* MDC;
+
+attribute_definition_list  ::= attribute_definition ( ps+ 
+	     attribute_definition )*;
+
+attribute_definition  ::= attribute_name ps+ declared_value ps+ default_value;
+
+attribute_name  ::= name;
+
+declared_value  ::= "CDATA" | "ENTITY" | "ENTITIES" | "ID" | "IDREF"
+	| "IDREFS" | "NAME" | "NAMES" | "NMTOKEN" | "NMTOKENS" | "NUMBER"
+	| "NUMBERS" | "NUTOKEN" | "NUTOKENS" | notation | name_token_group;
+
+notation  ::= "NOTATION" ps+ name_group;
+
+default_value  ::= ( ( RNI "FIXED" ps+ )? attribute_value_specification )
+	| ( RNI ( "REQUIRED" | "CURRENT" | "CONREF" | "IMPLIED" ) );
+
+notation_declaration  ::= MDC "NOTATION" ps+ notation_name 
+	  ps+ notation_identifier ps* MDC;
+
+notation_identifier  ::= external_identifier ;
+
+associated_notation_name  ::= RNI "NOTATION" ps+ ( notation_name
+	  | name_group );
+
+data_attribute_specification  ::= ps+ DSO attribute_specification_list s* DSC;
+
+short_reference_mapping_declaration  ::= MDC "SHORTREF" ps+ map_name 
+	  ( ps+ parameter_literal ps+ name )+ ps* MDC;
+
+map_name  ::= name ;
+
+short_reference_use_declaration  ::= MDC "USEMAP" ps+ map_specification 
+	  ( ps+ associated_element_type )? ps* MDC; 
+
+map_specification  ::= map_name | ( RNI "EMPTY" );
+
+link_type_declaration  ::= MDC "LINKTYPE" ps+ link_type_name ps+ 
+	  ( simple_link_specification | implicit_link_specification
+	  | explicit_link_specification ) ( ps+ external_identifier )?
+	  ( ps+ DSO link_type_declaration_subset DSC  )? ps* MDC;
+
+link_type_name  ::= name ;
+
+simple_link_specification  ::= RNI "SIMPLE" ps+ RNI "IMPLIED";
+
+implicit_link_specification  ::= source_document_type_name ps+ RNI "IMPLIED";
+
+explicit_link_specification  ::= source_document_type_name ps+ 
+	  result_document_type_name;
+
+source_document_type_name  ::= document_type_name ;
+
+result_document_type_name  ::= document_type_name ;
+
+link_type_declaration_subset  ::= ( link_attribute_set
+	   | link_set_declaration )* ID_link_set_declaration? 
+	   ( link_attribute_set | link_set_declaration )*;
+
+link_attribute_set  ::= ( attribute_definition_list_declaration | entity_set )*;
+
+link_set_declaration  ::= MDC "LINK" ps+ link_set_name 
+	  ( ps+ link_rule  )+ ps+ MDC;
+
+link_rule  ::= source_element_specification | explicit_link_rule;
+
+link_set_name  ::= name | ( RNI "INITIAL" );
+
+source_element_specification  ::= associated_element_type 
+	   ( ps+ RNI "USELINK" ps+ ( link_set_name | ( RNI "EMPTY" ) ) )?
+	   ( ps+ RNI "POSTLINK" ps+ link_set_specification )?
+	   link_attribute_specification?;
+
+link_attribute_specification  ::= ps+ DSO attribute_specification_list s* DSC;
+
+explicit_link_rule  ::= ( source_element_specification ps+ 
+	    result_element_specification )
+	| ( source_element_specification ps+ RNI "IMPLIED" )
+	| ( RNI "IMPLIED" ps+ result_element_specification );
+
+result_element_specification  ::= generic_identifier 
+	  result_attribute_specification?;
+
+result_attribute_specification  ::= ps+ DSO attribute_specification_list s* DSC;
+
+ID_link_set_declaration  ::= MDC "IDLINK" ( ps+ name ps+ link_rule  )+ ps* MDC;
+
+link_set_use_declaration  ::= MDC "USELINK" ps+ link_set_specification ps+ 
+	  link_type_name ps* MDC;
+
+link_set_specification  ::= link_set_name | ( RNI "EMPTY" ) | ( RNI "RESTORE" );
+
+SGML_declaration  ::= MDC "SGML" ps+ minimum_literal 
+	  ps+ document_character_set ps+ capacity_set 
+	  ps+ concrete_syntax_scope ps+ concrete_syntax 
+	  ps+ feature_use ps+ application_specific_information 
+	  ps* MDC;
+
+document_character_set  ::= "CHARSET" ps+ character_set_description;
+
+character_set_description  ::= base_character_set ps+ 
+	  described_character_set_portion ( ps+ base_character_set 
+	     ps+ described_character_set_portion )*;
+
+base_character_set  ::= "BASESET" ps+ public_identifier;
+
+described_character_set_portion  ::= "DESCSET" ( ps+ character_description )+;
+
+character_description  ::= described_set_character_number ps+ 
+	  number_of_characters ps+ ( base_set_character_number
+	  | minimum_literal | "UNUSED" );
+
+described_set_character_number  ::= character_number ;
+
+base_set_character_number  ::= character_number ;
+
+number_of_characters  ::= number ;
+
+capacity_set  ::= "CAPACITY" ps+ 
+	  ( ( "PUBLIC" ps+ public_identifier )
+	  | ( "SGMLREF" ( ps+ name ps+ number )+ ) );
+
+concrete_syntax_scope  ::= "SCOPE" ps+ ( "DOCUMENT" | "INSTANCE" );
+
+concrete_syntax  ::= "SYNTAX" ps+ ( public_concrete_syntax
+	  | ( shunned_character_number_identification 
+	      ps+ syntax_reference_character_set ps+ 
+	      function_character_identification 
+	      ps+ naming_rules ps+ delimeter_set 
+	      ps+ reserved_name_use ps+ quantity_set ) );
+
+public_concrete_syntax  ::= "PUBLIC" ps+ system_identifier 
+     ( ps+ "SWITCHES" ( ps+ character_number ps+ character_number )+ )?;
+
+shunned_character_number_identification  ::= "SHUNCHAR" ps+ ( "NONE"
+	  | ( ( "CONTROLS" | character_number ) ( ps+ character_number )* ) );
+
+syntax_reference_character_set  ::= character_set_description ;
+
+function_character_identification  ::= "FUNCTION" ps+ "RE" ps+ character_number 
+	  ps+ "RS" ps+ character_number 
+	  ps+ "SPACE" ps+ character_number 
+	  ( ps+ added_function ps+ function_class ps+ character_number )*;
+
+added_function  ::= name ;
+
+function_class  ::= "FUNCHAR" | "MSICHAR" | "MSOCHAR" | "MSSCHAR" | "SEPCHAR";
+
+naming_rules  ::= "NAMING" ps+ "LCNMSTRT"
+	  ( ps+ parameter_literal )+ ps+ "UCNMSTRT"
+	  ( ps+ parameter_literal )+ ps+ "LCNMCHAR"
+	  ( ps+ parameter_literal )+ ps+ "UCNMCHAR"
+	  ( ps+ parameter_literal )+ ps+ "NAMECASE"
+	  ps+ "GENERAL" ps+ ( "NO" | "YES" )
+	  ps+ "ENTITY" ps+ ( "NO" | "YES" );
+
+delimeter_set  ::= "DELIM" ps+ general_delimeters ps+ 
+	  short_reference_delimeters;
+
+general_delimeters  ::= "GENERAL" ps+ "SGMLREF"
+	  ( ps+ name ps+ parameter_literal )*;
+
+short_reference_delimeters  ::= "SHORTREF" ps+ 
+	  ( "SGMLREF" | "NONE" ) ( ps+ parameter_literal )*;
+
+reserved_name_use  ::= "NAMES" ps+ "SGMLREF"
+	  ( ps+ name ps+ parameter_literal )*;
+
+quantity_set  ::= "QUANTITY" ps+ "SGMLREF" ( ps+ name ps+ number )*;
+
+feature_use  ::= "FEATURES" ps+ markup_minimization_features 
+	  ps+ link_type_features ps+ other_features;
+
+markup_minimization_features  ::= "MINIMIZE" ps+ "DATATAG"
+	  ps+ ( "NO" | "YES" ) ps+ "OMITTAG" ps+ ( "NO" | "YES" )
+	  ps+ "RANK" ps+ ( "NO" | "YES" )
+	  ps+ "SHORTTAG" ps+ ( "NO" | "YES" );
+
+link_type_features  ::= "LINK" ps+ "SIMPLE" ps+ ( "NO" | ( "YES" ps+ number ) )
+	  ps+ "IMPLICIT" ps+ ( "NO" | "YES" )
+	  ps+ "EXPLICIT" ps+ ( "NO" | ( "YES" ps+ number ) );
+
+other_features  ::= "OTHER" ps+ "CONCUR" ps+ ( "NO" | ( "YES" ps+ number ) )
+	  ps+ "SUBDOC" ps+ ( "NO" | ( "YES" ps+ number ) )
+	  ps+ "FORMAL" ps+ ( "NO" | "YES" );
+
+application_specific_information  ::= "APPINFO" ps+ ( "NONE" | minimum_literal );
+
+system_declaration  ::= MDC "SYSTEM" ps+ minimum_literal ps+ 
+	  document_character_set ps+ capacity_set 
+	  ps+ feature_use ps+ concrete_syntax_scope 
+	  ps+ concrete_syntaxes_supported ps+ validation_services 
+	  ps+ SDIF_support ps* MDC;
+
+concrete_syntaxes_supported  ::= ( ps+ concrete_syntax 
+	   ( ps+ concrete_syntax_changes )? )*;
+
+concrete_syntax_changes  ::= "CHANGES" ps+ ( "SWITCHES" | ( "DELIMLEN"
+	      ps+ number ps+ "SEQUENCE" ps+ ( "YES" | "NO" )
+	      ps+ "SRCNT" ps+ number 
+	      ps+ "SRLEN" ps+ number ) );
+
+validation_services  ::= "VALIDATE" ps+ "GENERAL" ps+ ( "NO" | "YES" )
+	  ps+ "MODEL" ps+ ( "NO" | "YES" ) ps+ "EXCLUDE"
+	  ps+ ( "NO" | "YES" ) ps+ "CAPACITY"
+	  ps+ ( "NO" | "YES" ) ps+ "NONSGML" ps+ ( "NO" | "YES" ) ps+ "SGML"
+	  ps+ ( "NO" | "YES" ) ps+ "FORMAL" ps+ ( "NO" | "YES" );
+
+SDIF_support  ::= "SDIF" ps+ "PACK"
+	  ps+ ( "NO" | ( "YES" ( ps+ "ASN1" )? ) )
+	  ps+ "UNPACK" ps+ ( "NO" | ( "YES" ( ps+ "ASN1" )? ) );
